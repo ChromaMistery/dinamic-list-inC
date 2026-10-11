@@ -1,0 +1,106 @@
+LE PEDI A CLAUDE QUE ME DIERA UNA LISTA DE PRUEBAS INTENSIVAS
+
+
+1-nuevo: size=0 cap=5 [ ]
+2-tras addend: size=1 cap=5 [ 4.5 ]
+3-ERROR, indice negativo {Negative Index} in main.c, on line 118
+ calling: vecf_removeen
+4- -0.372549 fuera de rango, size comienza a contar desde 1, no desde cero
+5- seis elementos: size=6 cap=11 [ 0 1 2 3 4 5 ] (capacity * 2 + 1)
+6-capacidad 1: size=10 cap=11 [ 0 1 2 3 4 5 6 7 8 9 ]
+7-capacidad 0: size=1 cap=3 [ 1 ]
+8-antes: size=3 cap=5 [ 1 2 3 ]
+despues: size=4 cap=5 [ 9 1 1 1 ]
+9-en medio: size=4 cap=5 [ 1 2 7 3 ]
+al final: size=5 cap=5 [ 1 2 7 3 5 ]
+10-inicio: size=4 cap=5 [ 0 1 2 3 ]
+quito 1: size=3 cap=5 [ 0 2 3 ]
+quito 0: size=2 cap=5 [ 2 3 ]
+11-antes: size=2 cap=5 [ 1 2 ]
+quedo uno: size=1 cap=5 [ 2 ]
+ERROR, len of list is 0,1 {Out Of Range} in main.c, on line 138
+ calling: vecf_removedbyindex
+ 12- sub
+        linea 1 ERROR, indice fuera de rango {Negative index} in main.c, on line 145
+ calling: vecf_removedbyindex
+        linea 2  - no se quejo nadie
+        linea 3 - ERROR, indice fuera de rango {Out Of Range} in main.c, on line 175
+ calling: vecf_addbyindexc (aqui append tiene su proposito)
+        linea 4 - ERROR, indice fuera de rango {Negative Index} in main.c, on line 183
+ calling: vecf_addbyindexc
+
+13 -a: size=2 cap=5 [ 0 1 ]
+b: size=4 cap=6 [ 99 1 2 5 ]
+punteros distintos: 1
+
+14 - limpio: size=0 cap=23 [ ]
+reusado: size=1 cap=23 [ 3 ]
+doble limpieza: size=0 cap=23 [ ]
+
+15 - no hace nada con: gcc -Wall -Wextra -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer main.c -o programa
+./programa, el sanitize no se quejo de nada ni cuando lo compile
+
+pero cuando lo corri con valgrind recompilando de nuevo con gcc main.c -o programa salio esto:
+==43330== Memcheck, a memory error detector
+==43330== Copyright (C) 2002-2026, and GNU GPL'd, by Julian Seward et al.
+==43330== Using Valgrind-3.27.1 and LibVEX; rerun with -h for copyright info
+==43330== Command: ./programa
+==43330==
+^C^C^Cc==43330==
+==43330== Process terminating with default action of signal 2 (SIGINT)
+==43330==    at 0x400C5E: main (in /home/chroma-misterius/CODE/C/dinamicList/programa)
+==43330==
+==43330== HEAP SUMMARY:
+==43330==     in use at exit: 393,212 bytes in 1 blocks
+==43330==   total heap usage: 83,938 allocs, 83,937 frees, 20,120,920,208 bytes allocated
+==43330==
+==43330== LEAK SUMMARY:
+==43330==    definitely lost: 0 bytes in 0 blocks
+==43330==    indirectly lost: 0 bytes in 0 blocks
+==43330==      possibly lost: 0 bytes in 0 blocks
+==43330==    still reachable: 393,212 bytes in 1 blocks
+==43330==         suppressed: 0 bytes in 0 blocks
+==43330== Rerun with --leak-check=full to see details of leaked memory
+==43330==
+==43330== For lists of detected and suppressed errors, rerun with: -s
+==43330== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+//parece que se tarda o simplemente no hace nada
+
+16 -  if (v->size == 0) {
+        fprintf(stderr, "ERROR, size is 0 {no size} in %s, on line %d \n calling: vecf_addbyindex",
+            __FILE_NAME__, __LINE__);
+
+        exit(1);
+    }
+
+    ERROR, size is 0 {no size} in main.c, on line 190
+ calling: vecf_addbyindex
+
+17- size=50001 cap=100003, con esto creo que confirmamos que el compilado seguro hace que vaya lento y por eso
+el test no 15 fue erratico
+
+18 - size vec=68, size ref=68
+iguales: 1
+
+
+
+PRUEBAS FALLIDAS TENIENDO EXITO DEBIDO AL ARREGLO DE LOS BUGS
+
+
+
+4: error de índice fuera de rango.-ERROR, indice fuera de rango {Out Of Range} in main.c, on line 203
+ calling: vecf_clonevalue_by_index
+8: 9 1 2 3.-despues: size=5 cap=5 [ 9 1 2 3 ]
+
+11: quita el último sin error y termina con size=0.
+antes: size=2 cap=5 [ 1 2 ]
+quedo uno: size=1 cap=5 [ 2 ]
+quedo cero: size=0 cap=5 [ ]
+
+12, línea 2: error de índice fuera de rango.
+RROR, indice fuera de rango {Out Of Range} in main.c, on line 131
+ calling: vecf_removedbyindex
+15: termina rápido.size=100000 cap=196607
+valores correctos: 1
+16: inserta bien en el vector vacío (después de quitar el chequeo de size == 0).
+resultado: size=10 cap=15 [ 9 8 7 6 5 4 3 2 1 0 ]
